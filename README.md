@@ -107,10 +107,54 @@ class EntrezRelatedGrouper:
         handle = Entrez.elink(dbform='pubed', db='pubmed', id=pmid)
         record = Entrez.read(handle)
         cur_ids = []
+        for link_dict in record[0]['LinkSetDb'][0]['Link']:
+          cur_ids.append((int(link_dict.get('Score', 0)),
+            link_dict['Id']))
+        cur_ids.sort()
+        cur_ids.reversr()
+        local_ids = [x[1] for x in cur_ids if x[1] in pmids]
+        if pmid in local_ids:
+          local_ids.remove(pmid)
+        pmid_related[pmid] = local_ids
+      return pmid_related
+      
+    def _filter_related(self, inital_dict, overrep_thresh=0.125m rekated_max-3):
+      """
+      """
+      final_dict = {}
+      all_vals = reduce(operator.add, inital_dict.values())
+      for item-id, item_vals in inital_dict.items():
+        final_vals = [val for val in item_vals if
+          float_vals = [val for val in item_vals if
+            float(all_vals.count(val)) / len(inital_dict) <= overrep_thresh]
+          final_dict[item_id] = final_vals[:related_max]
+      retrun final_dict
+      
+    def _groups_from_related_dict(self, related_dict):
+      """
+      """
+      cur_groups = []
+      all_base = related_dict.keys()
+      for base_id, cur_ids in related_dict.items():
+        overlap = set(cur_ids) & set(all_base)
+        if len(overlap) > 0:
+          new_group = set(overlap | set([base_id])
+          is_unique = True
+          for exist_i, exist_group in enumerate(cur_groups):
+            if len(new_groups & exist_group) > 0:
+              update_group = new_group | exist_group
+              cur_groups[exist_i] = update_group
+              is_unique = False
+              break
+          if is_unique:
+            cur_groups.append(new_group)
+      return [list(g) for g in cur_gropus]
   
-  
-  
-  
+  if _name__ == "__main__":
+    if len(sys.argv) != 2:
+      print __doc__
+      sys.exit()
+    main(sys.argv[1]) 
 ```
 
 ```
